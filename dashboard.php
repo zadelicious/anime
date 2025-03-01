@@ -266,5 +266,68 @@ $flashMessage = getFlashMessage();
             </div>
         </div>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Fetch Anime List in Real-Time
+            function fetchAnimeList() {
+                fetch('get_anime_list.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            const animeGrid = document.querySelector('.anime-grid');
+                            animeGrid.innerHTML = '';
+                            data.anime_list.forEach(anime => {
+                                const animeCard = document.createElement('div');
+                                animeCard.className = 'anime-card';
+                                animeCard.dataset.status = anime.status;
+                                animeCard.innerHTML = `
+                                    <img src="${anime.image_url}" class="anime-card-img" alt="${anime.title}">
+                                    <div class="anime-card-content">
+                                        <h3 class="anime-card-title">${anime.title}</h3>
+                                        <p class="anime-card-status">Status: ${anime.status}</p>
+                                        ${anime.rating ? `<p class="anime-card-status">Rating: ${anime.rating}/10</p>` : ''}
+                                        <div class="anime-card-actions">
+                                            <button class="btn btn-sm" onclick="showDetails(${anime.anime_id})">
+                                                <i class="fas fa-info-circle"></i> Details
+                                            </button>
+                                            ${anime.favorite ? `<button class="btn btn-sm" style="background: var(--secondary);">
+                                                <i class="fas fa-heart"></i>
+                                            </button>` : ''}
+                                        </div>
+                                    </div>
+                                `;
+                                animeGrid.appendChild(animeCard);
+                            });
+                        } else {
+                            console.error('Error fetching anime list:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching anime list:', error));
+            }
+
+            // Fetch User Profile in Real-Time
+            function fetchUserProfile() {
+                fetch('get_user_profile.php')
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            document.querySelector('.user-avatar').src = 'uploads/' + data.profile_pic;
+                            document.querySelector('.dashboard-header h2').innerText = 'Welcome, ' + data.username + '!';
+                        } else {
+                            console.error('Error fetching user profile:', data.message);
+                        }
+                    })
+                    .catch(error => console.error('Error fetching user profile:', error));
+            }
+
+            // Initialize Real-Time Fetching
+            setInterval(fetchAnimeList, 5000); // Fetch anime list every 5 seconds
+            setInterval(fetchUserProfile, 5000); // Fetch user profile every 5 seconds
+
+            // Initial Fetch
+            fetchAnimeList();
+            fetchUserProfile();
+        });
+    </script>
 </body>
 </html>

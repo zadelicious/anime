@@ -533,7 +533,7 @@ function showToast(message, type = 'info') {
     `;
     
     document.head.appendChild(style);
-    document.body.appendChild(toast);
+    document.body.append
     
     // Remove toast after 3 seconds
     setTimeout(() => {
